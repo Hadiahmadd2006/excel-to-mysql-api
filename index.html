@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Excel to MySQL Uploader</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 20px; 
+        }
+        .upload-form { 
+            border: 2px dashed #ccc; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        .status { 
+            margin-top: 20px; 
+            padding: 10px; 
+        }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Excel to MySQL Uploader</h1>
+    <div class="upload-form">
+        <form id="uploadForm">
+            <input type="file" name="file" accept=".xlsx" required>
+            <button type="submit">Upload and Process</button>
+        </form>
+    </div>
+    <div class="status" id="status"></div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const status = document.getElementById('status');
+            status.textContent = 'Uploading...';
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    status.className = 'status success';
+                    status.textContent = result.message;
+                } else {
+                    status.className = 'status error';
+                    status.textContent = result.detail || 'Upload failed';
+                }
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Upload failed: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>
